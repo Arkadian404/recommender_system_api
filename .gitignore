@@ -1,2 +1,3 @@
 .ipynb_checkpoints
 .env
+docker-compose.yml
