@@ -15,6 +15,13 @@ os.environ["LANGCHAIN_API_KEY"] = os.getenv("LANGCHAIN_API_KEY")
 app = FastAPI()
 origins = ["*"]
 
+DB_USER = "root"
+DB_PASSWORD = "123456"
+DB_HOST = os.getenv("DB_HOST", "localhost")
+DB_PORT = 3306
+DATABASE = "filtro_jwt"
+
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -33,7 +40,8 @@ class UserQuery(BaseModel):
     message: str
 
 
-connect_string = "mysql+pymysql://root:123456@127.0.0.1:3306/filtro_jwt"
+connect_string = ('mysql+pymysql://{}:{}@{}:{}/{}'
+                  .format(DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, DATABASE))
 recommendations_service = KNN.KNN(connect_string)
 user_memory_dicts = {}
 
