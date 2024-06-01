@@ -17,7 +17,7 @@ jobs:
         env:
             MYSQL_ROOT_PASSWORD: 123456
             MYSQL_DATABASE: filtro_jwt
-        options: --health-cmd "mysqladmin ping" --health-interval 10s --health-timeout 5s --health-retries 5
+        options: --health-cmd "mysqladmin ping" --health-interval 10s --health-timeout 5s --health-retries 3
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
