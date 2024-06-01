@@ -12,8 +12,8 @@ class KNN:
         self.load_data_and_train()
 
     def load_data_and_train(self):
-        review_query = "SELECT * FROM REVIEW"
-        product_query = "SELECT * FROM PRODUCT"
+        review_query = "SELECT * FROM review"
+        product_query = "SELECT * FROM product"
         reviews = pd.read_sql(review_query, self.db)
         products = pd.read_sql(product_query, self.db)
 
