@@ -1,4 +1,4 @@
-print("HELLO, I'M A TEST APP")
+print("HELLO")
 
-f=open("requirements.txt", "r")
+f = open('requirements.txt', 'r', encoding='ISO-8859-1')
 print(f.read())
