@@ -16,6 +16,10 @@ class SQLAgent:
             "query": "SELECT * FROM product;"
         },
         {
+          "input": "Cửa hàng hiện tại bán bao nhiêu loại sản phẩm",
+          "query": "SELECT count(id) FROM category;"
+        },
+        {
             "input": "Tìm tất cả sản phẩm thuộc loại cà phê đóng chai",
             "query": "SELECT p.name, c.name FROM product p join category c on p.category_id = c.id where c.name = 'cà phê đóng chai';",
         },

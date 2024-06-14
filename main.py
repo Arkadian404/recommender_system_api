@@ -35,11 +35,6 @@ class Response(BaseModel):
     recommendations: List[int] | None
     detail: str | None
 
-
-class UserQuery(BaseModel):
-    message: str
-
-
 connect_string = ('mysql+pymysql://{}:{}@{}:{}/{}'
                   .format(DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, DATABASE))
 recommendations_service = KNN.KNN(connect_string)
@@ -62,8 +57,8 @@ async def recommendations(user_id: int):
     return Response(recommendations=re, detail="Success")
 
 
-@app.post("/chatbot/invoke/{user_id}")
-async def agent_invoke(user_id: str, user_query: UserQuery):
+@app.get("/chatbot/invoke/{user_id}")
+async def agent_invoke(user_id: str, user_query: str):
     if user_id not in user_memory_dicts:
         user_memory_dicts[user_id] = ConversationBufferMemory(memory_key='history',
                                                               input_key='input',
@@ -71,5 +66,5 @@ async def agent_invoke(user_id: str, user_query: UserQuery):
                                                               return_messages=True)
     memory = user_memory_dicts[user_id]
     chatbot = Chatbot.SQLAgent(connect_string, memory)
-    response = chatbot.run(user_query.message)
+    response = chatbot.run(user_query)
     return response["output"]
