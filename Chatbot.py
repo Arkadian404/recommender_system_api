@@ -9,7 +9,7 @@ from langchain_openai import OpenAIEmbeddings
 
 
 class SQLAgent:
-    model = "gpt-3.5-turbo-0125"
+    model = "gpt-4o"
     examples = [
         {
             "input": "Liệt kê hết tất cả sản phẩm",
