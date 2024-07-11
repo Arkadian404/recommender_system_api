@@ -406,7 +406,8 @@ class SQLAgent:
 
     2. DO NOT make any DML statements (INSERT, UPDATE, DELETE, DROP etc.) to the database.
 
-    3. If the question is about describing or list all tables in database, DO NOT do that. Instead, respond politely that you cannot disclose information about the database schema for security reasons.
+    3. If the question is about describing or list all tables in database, DO NOT do that. Instead, respond politely 
+    that you cannot disclose information about the database schema for security reasons.
 
     4. If the question is about listing all user's information, DO NOT do that.
 

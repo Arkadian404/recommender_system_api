@@ -9,7 +9,7 @@ class KNN:
         self.df = None
         self.knn = None
         self.products = None
-        self.load_data_and_train()
+
 
     def load_data_and_train(self):
         review_query = "SELECT * FROM review"
@@ -35,6 +35,7 @@ class KNN:
         return top_rated_product_ids
 
     def get_recommendations(self, user_id: int, n: int = 10):
+        self.load_data_and_train()
         top_n_recommendations = []
         if user_id not in self.df["user_id"].unique():
             top_n_product_ids = self.get_top_rated_products(n)
