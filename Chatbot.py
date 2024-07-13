@@ -40,14 +40,6 @@ class SQLAgent:
             "query": "SELECT SUM(sold) as total_sold FROM product;",
         },
         {
-            "input": "Liệt kê các khách hàng có địa chỉ ở Hà Nội",
-            "query": "SELECT * FROM user WHERE province = 'Hà Nội';",
-        },
-        {
-            "input": "Khách hàng có ID là 44 có tổng cộng bao nhiêu đơn hàng đã đặt?",
-            "query": "SELECT COUNT(id) FROM `order` WHERE user_id = 44;",
-        },
-        {
             "input": "Liệt kê các thương hiệu cà phê nào bán được nhiều sản phẩm nhất",
             "query": "SELECT b.name, SUM(sold) as total_sold FROM product p JOIN brand b ON p.brand_id = b.id GROUP BY b.id;",
         },
@@ -56,16 +48,8 @@ class SQLAgent:
             "query": "SELECT p.name FROM product p JOIN product_origin po ON p.product_origin_id = po.id WHERE po.continent LIKE '%Châu Mỹ%';",
         },
         {
-            "input": "Top 5 khách hàng mua hàng nhiều nhất dựa trên tổng tiền của đơn hàng",
-            "query": "SELECT user_id, full_name, SUM(total) AS total_purcharse FROM `order` GROUP BY user_id, full_name ORDER BY total_purcharse DESC LIMIT 5;",
-        },
-        {
             "input": "Liệt kê các sản phẩm ra mắt vào năm 2023",
             "query": "SELECT  p.name FROM product p WHERE  year(p.created_at) = 2023;",
-        },
-        {
-            "input": "Có bao nhiêu đơn hàng trong hệ thống",
-            "query": 'SELECT COUNT(id) as total FROM `order`;"',
         },
         {
             "input": "Tôi muốn mua cà phê rẻ của hệ thống, bạn hãy gợi ý cho tôi 1 vài sản phẩm",
@@ -213,7 +197,7 @@ class SQLAgent:
             "query": "SELECT c.name AS CategoryName, p.name AS ProductName, pd.price AS Price FROM category c JOIN product p ON c.id = p.category_id JOIN product_detail pd ON p.id = pd.product_id JOIN (    SELECT p.category_id,  MIN(pd.price) AS MinPrice FROM product p JOIN product_detail pd ON p.id = pd.product_id GROUP BY p.category_id) AS MinPrices ON c.id = MinPrices.category_id AND pd.price = MinPrices.MinPrice GROUP BY c.name, p.name, pd.price ORDER BY c.name;"
         },
         {
-            "input": "Trong mỗi loại sản phẩm, hãy liệt kê những loại sản phẩm được bán chạy nhất",
+            "input": "Trong mỗi loại sản phẩm, hãy liệt kê sản phẩm được bán chạy nhất",
             "query": "WITH RankedProducts AS ( SELECT p.id, p.name AS ProductName, c.name AS CategoryName, p.sold, ROW_NUMBER() OVER(PARTITION BY p.category_id ORDER BY p.sold DESC) AS rn FROM product p JOIN category c ON p.category_id = c.id) SELECT ProductName, CategoryName, sold FROM RankedProducts WHERE rn = 1;"
         },
         {
@@ -237,7 +221,7 @@ class SQLAgent:
             "query": "(SELECT p.id, p.name, v.code FROM product p left join voucher v on p.sale_id = v.id WHERE p.sale_id IS NOT NULL) UNION (SELECT p.id, p.name, v.code FROM product p JOIN category c ON p.category_id = c.id JOIN voucher v ON c.id = v.category_id WHERE v.code IS NOT NULL AND v.expiration_date > CURRENT_DATE);"
         },
         {
-            "input": "Liệt kê các sản phẩm đang được giảm giá hoặc sử dụng voucher",
+            "input": "Liệt kê các sản phẩm được giảm giá hoặc sử dụng voucher từ ngày 20/1/2023",
             "query": "(SELECT p.id, p.name, v.code FROM product p left join voucher v on p.sale_id = v.id WHERE p.sale_id IS NOT NULL) UNION (SELECT p.id, p.name, v.code FROM product p JOIN category c ON p.category_id = c.id JOIN voucher v ON c.id = v.category_id WHERE v.code IS NOT NULL AND v.expiration_date > '2023-01-20');"
         },
         {
@@ -249,7 +233,7 @@ class SQLAgent:
             "query": "SELECT p.id, p.name, COUNT(r.product_id) AS NumberOfReviews, AVG(r.rating) AS AverageRating FROM product p LEFT JOIN review r ON p.id = r.product_id GROUP BY p.id, p.name ORDER BY NumberOfReviews DESC, AverageRating DESC LIMIT 1;"
         },
         {
-            "input": "Tìm sản phẩm có số lượng đánh giá và số sao đánh giá trung bình cao nhất",
+            "input": "Tìm sản phẩm có số sao đánh giá trung bình và số lượng đánh giá cao nhất",
             "query": "SELECT p.id, p.name, COUNT(r.product_id) AS NumberOfReviews, AVG(r.rating) AS AverageRating FROM product p LEFT JOIN review r ON p.id = r.product_id GROUP BY p.id, p.name ORDER BY AverageRating DESC, NumberOfReviews DESC LIMIT 1;"
         },
         {
@@ -288,7 +272,6 @@ class SQLAgent:
             "input": "Top 3 sản phẩm có giá cao nhất cho mỗi loại sản phẩm",
             "query": "WITH RankedProducts AS ( SELECT p.id, p.name AS ProductName, c.name AS CategoryName, pd.price, ROW_NUMBER() OVER(PARTITION BY p.category_id ORDER BY pd.price desc) AS rn  FROM product p JOIN category c ON p.category_id = c.id JOIN product_detail pd ON p.id = pd.product_id) SELECT id, ProductName, CategoryName, price FROM RankedProducts WHERE rn <= 3;"
         },
-
         {
             "input": "Liệt kê các sản phẩm từ thương hiệu có nhiều sản phẩm nhất",
             "query": "WITH BrandProductCount AS ( SELECT brand_id, COUNT(*) AS product_count FROM product GROUP BY brand_id), MaxProductBrand AS ( SELECT brand_id FROM BrandProductCount  WHERE product_count = (SELECT MAX(product_count) FROM BrandProductCount)) SELECT p.id, p.name AS ProductName, b.name AS BrandName FROM  product p   JOIN brand b ON p.brand_id = b.id JOIN MaxProductBrand mpb ON b.id = mpb.brand_id;"
@@ -302,7 +285,7 @@ class SQLAgent:
             "query": "select po.name from product_origin po;"
         },
         {
-            "input": "Loại cà phê thuộc nguồn gốc nào bán chạy nhất hoặc bán nhiều nhất",
+            "input": "Cà phê thuộc nguồn gốc nào bán chạy nhất hoặc bán nhiều nhất",
             "query": "SELECT po.name, SUM(p.sold) as tong_so_luong_ban FROM product p LEFT JOIN product_origin po ON p.product_origin_id = po.id GROUP BY po.id, po.name ORDER BY tong_so_luong_ban DESC limit 1;"
         },
         {
@@ -388,7 +371,160 @@ class SQLAgent:
         {
             "input": "Các sản phẩm có hương vị trái cây và rượu nho",
             "query": "select * from product p left join flavor f on p.flavor_id = f.id where f.name like '%trái cây%' or f.name like '%rượu nho%';"
+        },
+        {
+            "input": "Loại sản phẩm nào có sản phẩm đắt nhất",
+            "query": "SELECT c.name, p.name, pd.price FROM category c JOIN product p ON c.id = p.category_id JOIN product_detail pd ON p.id = pd.product_id WHERE pd.price = ( SELECT MAX(pd_inner.price) FROM product_detail pd_inner JOIN product p_inner ON pd_inner.product_id = p_inner.id);"
+        },
+        {
+            "input": "Loại sản phẩm nào có sản phẩm tồn kho nhiều nhất",
+            "query": "SELECT c.name, p.name, pd.stock FROM category c JOIN product p ON c.id = p.category_id JOIN product_detail pd ON p.id = pd.product_id WHERE pd.stock = ( SELECT MAX(pd_inner.stock) FROM product_detail pd_inner JOIN product p_inner ON pd_inner.product_id = p_inner.id);"
+        },
+        {
+            "input": "Sản phẩm Expresso được bán với giá như thế nào",
+            "query": "select p.name, pd.weight, pd.price, pd.stock from product p join product_detail pd on p.id = pd.product_id where p.name like '%espresso%';"
+        },
+        {
+            "input": "Liệt kê sản phẩm cà phê bột",
+            "query": "select p.name from product p left join category c on p.category_id = c.id where c.name like '%bột%';"
+        },
+        {
+            "input": "Liệt kê sản phẩm cà phê rang hoặc cà phê hạt đã rang",
+            "query": "select p.name from product p left join category c on p.category_id = c.id where c.name like '%rang%';"
+        },
+        {
+            "input": "Liệt kê cà phê nén hoặc cà phê hạt nén",
+            "query": "select p.name from product p left join category c on p.category_id = c.id where c.name like '%nén%';"
+        },
+        {
+            "input": "liệt kê cà phê đóng chai",
+            "query": "select p.name from product p left join category c on p.category_id = c.id where c.name like '%đóng chai%';"
+        },
+        {
+            "input": "Giá bán cà phê Colombia Santander Rose Valley",
+            "query": "select p.name, pd.weight, pd.price, pd.stock from product p join product_detail pd on p.id = pd.product_id where p.name like '%Colombia Santander Rose Valley%';"
+        },
+        {
+            "input": "liệt kê cà phê trái cây hoặc có vị trái cây",
+            "query": "select p.name from product p left join flavor f on p.flavor_id = f.id where f.name like '%trái cây%';"
+        },
+        {
+            "input": "liệt kê cà phê socola hoặc có vị socola",
+            "query": "select p.name from product p left join flavor f on p.flavor_id = f.id where f.name like '%socola%';"
+        },
+        {
+            "input": "liệt kê cà phê trái mơ hoặc có vị trái mơ",
+            "query": "select p.name from product p left join flavor f on p.flavor_id = f.id where f.name like '%mơ%';"
+        },
+        {
+            "input": "liệt kê cà phê nho hoặc có vị rượu nho",
+            "query": "select p.name from product p left join flavor f on p.flavor_id = f.id where f.name like '%nho%';"
+        },
+        {
+            "input": "liệt kê cà phê không mùi hoặc không vị hoặc có vị trung tính",
+            "query": "select p.name from product p left join flavor f on p.flavor_id = f.id where f.name like '%trung tính%';"
+        },
+        {
+            "input": "liệt kê cà phê Whiskey hoặc có vị Whiskey",
+            "query": "select p.name from product p left join flavor f on p.flavor_id = f.id where f.name like '%Whiskey%';"
+        },
+        {
+            "input": "liệt kê cà phê củ quả hoặc có vị củ quả",
+            "query": "select p.name from product p left join flavor f on p.flavor_id = f.id where f.name like '%củ quả%';"
+        },
+        {
+            "input": "liệt kê cà phê hỗn hợp hoặc có vị hỗn hợp",
+            "query": "select p.name from product p left join flavor f on p.flavor_id = f.id where f.name like '%hỗ hợp%';"
+        },
+        {
+            "input": "liệt kê cà phê hoa oải hương hoặc có vị oải hương hoặc cà phê oải hương",
+            "query": "select p.name from product p left join flavor f on p.flavor_id = f.id where f.name like '%oải hương%';"
+        },
+        {
+            "input": "liệt kê cà phê hoa nhài hoặc có vị hoa nhài",
+            "query": "select p.name from product p left join flavor f on p.flavor_id = f.id where f.name like '%hoa nhài%';"
+        },
+        {
+            "input": "liệt kê sản phẩm cà phê Artic Fox hoặc liệt kê cà phê có thương hiệu Artic Fox",
+            "query": "select p.name from product p left join brand b on p.brand_id = b.id where b.name like '%Artic Fox%';"
+        },
+        {
+            "input": "liệt kê sản phẩm cà phê Green Bean Intertrade hoặc liệt kê cà phê có thương hiệu Green Bean Intertrade",
+            "query": "select p.name from product p left join brand b on p.brand_id = b.id where b.name like '%Green Bean Intertrade%';"
+        },
+        {
+            "input": "liệt kê sản phẩm cà phê KACC hoặc liệt kê cà phê có thương hiệu KACC",
+            "query": "select p.name from product p left join brand b on p.brand_id = b.id where b.name like '%KACC%';"
+        },
+        {
+            "input": "liệt kê sản phẩm cà phê Stupiducks hoặc liệt kê cà phê có thương hiệu Stupiducks",
+            "query": "select p.name from product p left join brand b on p.brand_id = b.id where b.name like '%Stupiducks%';"
+        },
+        {
+            "input": "liệt kê cà phê châu mỹ hoặc sản phẩm cà phê châu mỹ",
+            "query": "select p.name from product p left join product_origin po on p.product_origin_id = po.id where po.continent like '%châu mỹ%';"
+        },
+        {
+            "input": "liệt kê cà phê châu á hoặc sản phẩm cà phê châu á",
+            "query": "select p.name from product p left join product_origin po on p.product_origin_id = po.id where po.continent like '%châu á%'; "
+        },
+        {
+            "input": "liệt kê cà phê châu phi hoặc sản phẩm cà phê châu phi",
+            "query": "select p.name from product p left join product_origin po on p.product_origin_id = po.id where po.continent like '%châu phi%'; "
+        },
+        {
+            "input": "liệt kê cà phê châu âu hoặc sản phẩm cà phê châu âu",
+            "query": "select p.name from product p left join product_origin po on p.product_origin_id = po.id where po.continent like '%châu âu%'; "
+        },
+        {
+            "input": "liệt kê cà phê brazil hoặc sản phẩm cà phê brazil",
+            "query": "select p.name from product p left join product_origin po on p.product_origin_id = po.id where po.name like '%Brazil%';"
+        },
+        {
+            "input": "liệt kê cà phê Colombia hoặc sản phẩm cà phê Colombia",
+            "query": "select p.name from product p left join product_origin po on p.product_origin_id = po.id where po.name like '%Colombia%'; "
+        },
+        {
+            "input": "liệt kê cà phê Kenya hoặc sản phẩm cà phê Kenya",
+            "query": "select p.name from product p left join product_origin po on p.product_origin_id = po.id where po.name like '%Kenya%'; "
+        },
+        {
+            "input": "liệt kê cà phê Việt Nam hoặc sản phẩm cà phê Việt Nam",
+            "query": "select p.name from product p left join product_origin po on p.product_origin_id = po.id where po.name like '%Việt Nam%'; "
+        },
+        {
+            "input": "liệt kê cà phê Ethiopia hoặc sản phẩm cà phê Ethiopia",
+            "query": "select p.name from product p left join product_origin po on p.product_origin_id = po.id where po.name like '%Ethiopia%'; "
+        },
+        {
+            "input": "liệt kê cà phê Honduras hoặc sản phẩm cà phê Honduras",
+            "query": "select p.name from product p left join product_origin po on p.product_origin_id = po.id where po.name like '%Honduras%'; "
+        },
+        {
+            "input": "liệt kê cà phê Costa Rica hoặc sản phẩm cà phê Costa Rica",
+            "query": "select p.name from product p left join product_origin po on p.product_origin_id = po.id where po.name like '%Costa Rica%'; "
+        },
+        {
+            "input": "liệt kê cà phê Myanmar hoặc sản phẩm cà phê Myanmar",
+            "query": "select p.name from product p left join product_origin po on p.product_origin_id = po.id where po.name like '%Myanmar%'; "
+        },
+        {
+            "input": "liệt kê cà phê Nicagarua hoặc sản phẩm cà phê Nicagarua",
+            "query": "select p.name from product p left join product_origin po on p.product_origin_id = po.id where po.name like '%Nicagarua%'; "
+        },
+        {
+            "input": "liệt kê cà phê Indonesia hoặc sản phẩm cà phê Indonesia",
+            "query": "select p.name from product p left join product_origin po on p.product_origin_id = po.id where po.name like '%Indonesia%'; "
+        },
+        {
+            "input": "liệt kê cà phê Trung Quốc hoặc sản phẩm cà phê Trung Quốc",
+            "query": "select p.name from product p left join product_origin po on p.product_origin_id = po.id where po.name like '%Trung Quốc%'; "
+        },
+        {
+            "input": "liệt kê cà phê Ý hoặc sản phẩm cà phê Ý",
+            "query": "select p.name from product p left join product_origin po on p.product_origin_id = po.id where po.name like '%Ý%'; "
         }
+
     ]
     system_prefix = """You are an AI friendly and helpful AI assistant for question-answering user's task about 
     products, orders, user information, .... Given an input question, create a syntactically correct {dialect} query 
@@ -410,14 +546,16 @@ class SQLAgent:
     that you cannot disclose information about the database schema for security reasons.
 
     4. If the question is about listing all user's information, DO NOT do that.
+    
+    5. Do not answer question about listing user's order history or top user's orders.
 
-    5. If the question is about user then ask them their username and email before querying data
+    6. If the question is about user then ask them their username and email before querying data
 
-    6. If the question is about order, ask them their order code and phone number before querying data.
+    7. If the question is about order, ask them their order code and phone number before querying data.
 
-    7. If the question is about the store's finances or related things.
+    8. If the question is about the store's finances or related things.
 
-    8. If the question does not seem related to the database, just say you don't know as the answer.
+    9. If the question does not seem related to the database, just say you don't know as the answer.
 
     Here is the relevant table info: {table_info}
     Here are some examples of user inputs and their corresponding SQL queries:"""
