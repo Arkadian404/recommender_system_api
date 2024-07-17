@@ -523,8 +523,207 @@ class SQLAgent:
         {
             "input": "liệt kê cà phê Ý hoặc sản phẩm cà phê Ý",
             "query": "select p.name from product p left join product_origin po on p.product_origin_id = po.id where po.name like '%Ý%'; "
+        },
+        {
+            "input": "tìm sản phẩm trái cây mà giá rẻ nhất",
+            "query": "SELECT p.id, p.name, f.name AS flavor_name, pd.price, pd.weight FROM product p JOIN product_detail pd ON p.id = pd.product_id JOIN flavor f ON p.flavor_id = f.id WHERE f.name like '%Trái cây%'  ORDER BY pd.price ASC LIMIT 1;"
+        },
+        {
+            "input": "tìm sản phẩm hương hoa nhài hay cà phê hương hoa nhài mà giá đắt nhất với khối lượng 250g",
+            "query": "SELECT p.id, p.name, f.name AS flavor_name, pd.price, pd.weight FROM product p JOIN product_detail pd ON p.id = pd.product_id JOIN flavor f ON p.flavor_id = f.id WHERE f.name like '%Hoa nhài%' and pd.weight = 250 ORDER BY pd.price DESC LIMIT 1;"
+        },
+        {
+            "input": "liệt kê loại sản phẩm có hương vị trái cây hoặc có hương vị trái cây",
+            "query": "SELECT DISTINCT c.id, c.name, count(p.id) as so_luong_san_pham FROM product p JOIN category c ON p.category_id = c.id JOIN flavor f ON p.flavor_id = f.id WHERE f.name like '%Trái cây%' AND c.status = 1 group by c.id;"
+        },
+        {
+            "input": "liệt kê hương vị",
+            "query": "select * from flavor;"
+        },
+        {
+            "input": "có bao nhiêu loại hương vị và số sản phẩm mỗi loại",
+            "query": "select f.name, count(p.id) as so_luong_san_pham from flavor f left join product p on f.id = p.flavor_id group by f.id;"
+        },
+        {
+            "input": "có bao nhiêu loại sản phẩm và số sản phẩm mỗi loại",
+            "query": "select c.name, count(p.id) as so_luong_san_pham from category c left join product p on c.id = p.category_id group by c.id;"
+        },
+        {
+            "input": "cà phê có nguồn gốc từ đâu là có nhiều hương vị nhất ",
+            "query": "select c.name, count(p.id) as so_luong_san_pham from category c left join product p on c.id = p.category_id group by c.id;"
+        },
+        {
+            "input": "cà phê xuất xứ từ đâu là có nhiều hương vị nhất",
+            "query": "SELECT o.name AS origin_name, COUNT(DISTINCT f.id) AS flavor_count FROM product p JOIN flavor f ON p.flavor_id = f.id JOIN product_origin o ON p.product_origin_id = o.id GROUP BY o.id, o.name ORDER BY flavor_count DESC LIMIT 1;"
+        },
+        {
+            "input": "cà phê xuất từ từ nước nào là có nhiều hương vị nhất",
+            "query": "SELECT o.name AS origin_name, COUNT(DISTINCT f.id) AS flavor_count FROM product p JOIN flavor f ON p.flavor_id = f.id JOIN product_origin o ON p.product_origin_id = o.id GROUP BY o.id, o.name ORDER BY flavor_count DESC LIMIT 1;"
+        },
+        {
+            "input": "cà phê có nguồn gốc từ lục địa nào là có nhiều hương vị nhất",
+            "query": "SELECT o.continent AS origin_name, COUNT(DISTINCT f.id) AS flavor_count FROM product p JOIN flavor f ON p.flavor_id = f.id JOIN product_origin o ON p.product_origin_id = o.id GROUP BY o.id, o.name ORDER BY flavor_count DESC LIMIT 1;"
+        },
+        {
+            "input": "cà phê có xuất xứ từ lục địa nào là có nhiều hương vị nhất",
+            "query": "SELECT o.continent AS origin_name, COUNT(DISTINCT f.id) AS flavor_count FROM product p JOIN flavor f ON p.flavor_id = f.id JOIN product_origin o ON p.product_origin_id = o.id GROUP BY o.id, o.name ORDER BY flavor_count DESC LIMIT 1;"
+        },
+        {
+            "input": "top 10 lục địa có nhiều hương vị cà phê nhất",
+            "query": "SELECT o.continent AS origin_name, COUNT(DISTINCT f.id) AS flavor_count FROM product p JOIN flavor f ON p.flavor_id = f.id JOIN product_origin o ON p.product_origin_id = o.id GROUP BY o.id, o.name ORDER BY flavor_count DESC LIMIT 10;"
+        },
+        {
+            "input": "loại hương vị nào được đánh giá nhiều nhất",
+            "query": "SELECT f.name AS flavor_name, COUNT(r.id) AS review_count FROM review r JOIN product p ON r.product_id = p.id JOIN flavor f ON p.flavor_id = f.id GROUP BY f.id, f.name ORDER BY review_count DESC limit 1;"
+        },
+        {
+            "input": "loại hương vị nào được đánh giá nhiều sao nhất",
+            "query": "SELECT f.name AS flavor_name, AVG(r.rating) AS average_rating FROM review r JOIN product p ON r.product_id = p.id JOIN flavor f ON p.flavor_id = f.id GROUP BY f.id, f.name ORDER BY average_rating DESC LIMIT 1;"
+        },
+        {
+            "input": "loại hương vị nào được người dùng thích nhất",
+            "query": "SELECT f.name AS flavor_name, AVG(r.rating) AS average_rating FROM review r JOIN product p ON r.product_id = p.id JOIN flavor f ON p.flavor_id = f.id GROUP BY f.id, f.name ORDER BY average_rating DESC LIMIT 1;"
+        },
+        {
+            "input": "loại hương vị nào được nhiều người dùng mua nhất",
+            "query": "SELECT f.name AS flavor_name, SUM(p.sold) AS total_sold FROM product p JOIN flavor f ON p.flavor_id = f.id GROUP BY f.id, f.name ORDER BY total_sold DESC limit 1;"
+        },
+        {
+            "input": "hương vị nào có nhiều sản phẩm giảm giá nhất",
+            "query": "SELECT flavor_name, SUM(discount_product_count) AS total_discount_product_count FROM (SELECT f.name AS flavor_name, COUNT(p.id) AS discount_product_count FROM product p JOIN flavor f ON p.flavor_id = f.id JOIN sale s ON p.sale_id = s.id GROUP BY f.id, f.name UNION ALL SELECT f.name AS flavor_name, COUNT(p.id) AS discount_product_count FROM product p JOIN flavor f ON p.flavor_id = f.id JOIN voucher v ON p.category_id = v.category_id GROUP BY f.id, f.name ) AS combined_discounts GROUP BY flavor_name ORDER BY total_discount_product_count DESC LIMIT 1;"
+        },
+        {
+            "input": "hương vị nào có nhiều sản phẩm giảm giá nhất từ ngày 30/1/2023 đến 25/1/2024",
+            "query": "SELECT flavor_name, SUM(discount_product_count) AS total_discount_product_count FROM (SELECT f.name AS flavor_name, COUNT(p.id) AS discount_product_count FROM product p JOIN flavor f ON p.flavor_id = f.id JOIN sale s ON p.sale_id = s.id where s.start > '2023-01-30' and s.end < '2024-01-25' GROUP BY f.id, f.name UNION ALL SELECT f.name AS flavor_name, COUNT(p.id) AS discount_product_count FROM product p JOIN flavor f ON p.flavor_id = f.id JOIN voucher v ON p.category_id = v.category_id where v.created_at > '2023-01-30' and v.expiration_date < '2024-01-25' GROUP BY f.id, f.name ) AS combined_discounts GROUP BY flavor_name ORDER BY total_discount_product_count DESC LIMIT 1;"
+        },
+        {
+            "input": "thương hiệu nào có nhiều hương vị nhất",
+            "query": "SELECT b.name AS brand_name, COUNT(DISTINCT p.flavor_id) AS unique_flavor_count FROM product p JOIN brand b ON p.brand_id = b.id GROUP BY b.id, b.name ORDER BY unique_flavor_count DESC LIMIT 1;"
+        },
+        {
+            "input": "thương hiệu nào có nhiều sản phẩm giảm giá nhất",
+            "query": "SELECT brand_name, SUM(discount_product_count) AS total_discount_product_count FROM (SELECT b.name AS brand_name, COUNT(p.id) AS discount_product_count FROM product p JOIN brand b ON p.brand_id = b.id JOIN sale s ON p.sale_id = s.id GROUP BY b.id, b.name UNION ALL SELECT b.name AS brand_name, COUNT(p.id) AS discount_product_count FROM product p JOIN brand b ON p.brand_id = b.id JOIN voucher v ON p.category_id = v.category_id GROUP BY b.id, b.name ) AS combined_discounts GROUP BY brand_name ORDER BY total_discount_product_count DESC LIMIT 1;"
+        },
+        {
+            "input": "thương hiệu nào có nhiều sản phẩm giảm giá nhất từ ngày 30/1/2023 đến 25/1/2024",
+            "query": "SELECT brand_name, SUM(discount_product_count) AS total_discount_product_count FROM (SELECT b.name AS brand_name, COUNT(p.id) AS discount_product_count FROM product p JOIN brand b ON p.brand_id = b.id JOIN sale s ON p.sale_id = s.id where s.start > '2023-01-30' and s.end < '2024-01-25' GROUP BY b.id, b.name UNION ALL SELECT b.name AS brand_name, COUNT(p.id) AS discount_product_count FROM product p JOIN brand b ON p.brand_id = b.id JOIN voucher v ON p.category_id = v.category_id where v.created_at > '2023-01-30' and v.expiration_date < '2024-01-25' GROUP BY b.id, b.name ) AS combined_discounts GROUP BY brand_name ORDER BY total_discount_product_count DESC LIMIT 1;"
+        },
+        {
+            "input": "tìm sản phẩm Colombia mà giá rẻ nhất",
+            "query": "SELECT p.id, p.name, po.name AS product_origin_name, pd.price, pd.weight FROM product p JOIN product_detail pd ON p.id = pd.product_id JOIN product_origin po ON p.product_origin_id = po.id WHERE po.name like '%colombia%'  ORDER BY pd.price ASC LIMIT 1;"
+        },
+        {
+            "input": "tìm sản phẩm colombia hay cà phê colombia mà giá đắt nhất với khối lượng 250g",
+            "query": "SELECT p.id, p.name, po.name AS product_origin_name, pd.price, pd.weight FROM product p JOIN product_detail pd ON p.id = pd.product_id JOIN product_origin po ON p.product_origin_id = po.id WHERE po.name like '%colombia%' and pd.weight = 250 ORDER BY pd.price DESC LIMIT 1;"
+        },
+        {
+            "input": "liệt kê loại sản phẩm có xuất xứ hoặc nguồn gốc từ colombia",
+            "query": "SELECT DISTINCT c.id, c.name, count(p.id) as so_luong_san_pham FROM product p JOIN category c ON p.category_id = c.id JOIN product_origin po ON p.product_origin_id = po.id WHERE po.name like '%colombia%' AND c.status = 1 group by c.id;  "
+        },
+        {
+            "input": "liệt kê nguồn gốc, xuất xứ",
+            "query": "select * from product_origin;"
+        },
+        {
+            "input": "có bao nhiêu loại nguồn gốc, xuất xứ và số sản phẩm mỗi loại",
+            "query": "select po.name, count(p.id) as so_luong_san_pham from product_origin po left join product p on po.id = p.product_origin_id group by po.id;"
+        },
+        {
+            "input": "loại sản phẩm có nguồn gốc, xuất xứ từ đâu được đánh giá nhiều nhất;",
+            "query": "SELECT po.name AS product_origin_name, COUNT(r.id) AS review_count FROM review r JOIN product p ON r.product_id = p.id JOIN product_origin po ON p.product_origin_id = po.id GROUP BY po.id, po.name ORDER BY review_count DESC limit 1;"
+        },
+        {
+            "input": "10 nguồn gốc, xuất xứ sản phẩm nào được đánh giá nhiều nhất;",
+            "query": "SELECT po.name AS product_origin_name, COUNT(r.id) AS review_count FROM review r JOIN product p ON r.product_id = p.id JOIN product_origin po ON p.product_origin_id = po.id GROUP BY po.id, po.name ORDER BY review_count DESC limit 10;"
+        },
+        {
+            "input": "cà phê có nguồn gốc, xuất xứ từ đâu được đánh giá nhiều sao nhất",
+            "query": "SELECT po.name AS product_origin_name, AVG(r.rating) AS average_rating FROM review r JOIN product p ON r.product_id = p.id JOIN product_origin po ON p.product_origin_id = po.id GROUP BY po.id, po.name ORDER BY average_rating DESC LIMIT 1;"
+        },
+        {
+            "input": "cà phê có nguồn gốc, xuất xứ từ đâu được người dùng thích nhất",
+            "query": "SELECT po.name AS product_origin_name, AVG(r.rating) AS average_rating FROM review r JOIN product p ON r.product_id = p.id JOIN product_origin po ON p.product_origin_id = po.id GROUP BY po.id, po.name ORDER BY average_rating DESC LIMIT 1;"
+        },
+        {
+            "input": "cà phê có nguồn gốc ở đâu được người dùng mua nhiều nhất",
+            "query": "SELECT po.name AS product_origin_name, SUM(p.sold) AS total_sold FROM product p JOIN product_origin po ON p.product_origin_id = po.id GROUP BY po.id, po.name ORDER BY total_sold DESC limit 1;"
+        },
+        {
+            "input": "sản phẩm có nguồn gốc, xuất xứ từ đâu là được giảm giá nhiều nhất?",
+            "query": "SELECT product_origin_name, SUM(discount_product_count) AS total_discount_product_count FROM (SELECT po.name AS product_origin_name, COUNT(p.id) AS discount_product_count FROM product p JOIN product_origin po ON p.product_origin_id = po.id JOIN sale s ON p.sale_id = s.id GROUP BY po.id, po.name UNION ALL SELECT po.name AS product_origin_name, COUNT(p.id) AS discount_product_count FROM product p JOIN product_origin po ON p.product_origin_id = po.id JOIN voucher v ON p.category_id = v.category_id GROUP BY po.id, po.name ) AS combined_discounts GROUP BY product_origin_name ORDER BY total_discount_product_count DESC LIMIT 1;"
+        },
+        {
+            "input": "cà phê có nguồn gốc, xuất xừ từ đâu được giảm giá nhiều nhất từ ngày 30/1/2023 đến 25/01/2024",
+            "query": "SELECT product_origin_name, SUM(discount_product_count) AS total_discount_product_count FROM (SELECT po.name AS product_origin_name, COUNT(p.id) AS discount_product_count FROM product p JOIN product_origin po ON p.product_origin_id = po.id JOIN sale s ON p.sale_id = s.id where s.start > '2023-01-30' and s.end < '2024-01-25' GROUP BY po.id, po.name UNION ALL SELECT po.name AS product_origin_name, COUNT(p.id) AS discount_product_count FROM product p JOIN product_origin po ON p.product_origin_id = po.id JOIN voucher v ON p.category_id = v.category_id where v.created_at > '2023-01-30' and v.expiration_date < '2024-01-25' GROUP BY po.id, po.name ) AS combined_discounts GROUP BY product_origin_name ORDER BY total_discount_product_count DESC LIMIT 1;"
+        },
+        {
+            "input": "cà phê có nguồn gốc, xuất xứ từ đâu thì có nhiều hương vị nhất",
+            "query": "SELECT b.name AS brand_name, COUNT(DISTINCT p.product_origin_id) AS unique_product_origin_count FROM product p JOIN brand b ON p.brand_id = b.id GROUP BY b.id, b.name ORDER BY unique_product_origin_count DESC LIMIT 1;"
+        },
+        {
+            "input": "tìm sản phẩm từ artic fox hoặc từ thương hiệu artic fox mà giá rẻ nhất",
+            "query": "SELECT p.id, p.name, b.name AS brand_name, pd.price, pd.weight FROM product p JOIN product_detail pd ON p.id = pd.product_id JOIN brand b ON p.brand_id = b.id WHERE b.name like '%artic fox%'  ORDER BY pd.price ASC LIMIT 1;"
+        },
+        {
+            "input": "tìm sản phẩm từ artic fox hay cà phê artic fox mà giá đắt nhất với khối lượng 250g",
+            "query": "SELECT p.id, p.name, b.name AS brand_name, pd.price, pd.weight FROM product p JOIN product_detail pd ON p.id = pd.product_id JOIN brand b ON p.brand_id = b.id WHERE b.name like '%artic fox%' and pd.weight = 250 ORDER BY pd.price DESC LIMIT 1;"
+        },
+        {
+            "input": "liệt kê loại sản phẩm artic fox hoặc sản phẩm từ artic fox hoặc sản phẩm có thương hiệu artic fox ",
+            "query": "SELECT DISTINCT c.id, c.name, count(p.id) as so_luong_san_pham FROM product p JOIN category c ON p.category_id = c.id JOIN brand b ON p.brand_id = b.id WHERE b.name like '%artic fox%' AND c.status = 1 group by c.id;  "
+        },
+        {
+            "input": "liệt kê thương hiệu hoặc liệt kê các brand",
+            "query": "select * from brand;"
+        },
+        {
+            "input": "có bao nhiêu thương hiệu và số sản phẩm mỗi loại",
+            "query": "select b.name, count(p.id) as so_luong_san_pham from brand b left join product p on b.id = p.brand_id group by b.id;"
+        },
+        {
+            "input": "cà phê từ thương hiệu nào là có nhiều hương vị nhất ",
+            "query": "SELECT b.name AS brand_name, COUNT(DISTINCT f.id) AS flavor_count FROM product p JOIN flavor f ON p.flavor_id = f.id JOIN brand b ON p.brand_id = b.id GROUP BY b.id, b.name ORDER BY flavor_count DESC LIMIT 1;"
+        },
+        {
+            "input": "cà phê xuất xứ từ thương hiệu nào thì có nhiều hương vị nhất",
+            "query": "SELECT b.name AS brand_name, COUNT(DISTINCT f.id) AS flavor_count FROM product p JOIN flavor f ON p.flavor_id = f.id JOIN brand b ON p.brand_id = b.id GROUP BY b.id, b.name ORDER BY flavor_count DESC LIMIT 1;"
+        },
+        {
+            "input": "top 10 thương hiệu có nhiều hương vị cà phê nhất",
+            "query": "SELECT b.name AS brand_name, COUNT(DISTINCT f.id) AS flavor_count FROM product p JOIN flavor f ON p.flavor_id = f.id JOIN brand b ON p.brand_id = b.id GROUP BY b.id, b.name ORDER BY flavor_count DESC LIMIT 10;"
+        },
+        {
+            "input": "sản phẩm thuộc thương hiệu nào đánh giá nhiều nhất",
+            "query": "SELECT b.name AS brand_name, COUNT(r.id) AS review_count FROM review r JOIN product p ON r.product_id = p.id JOIN brand b ON p.brand_id = b.id GROUP BY b.id, b.name ORDER BY review_count DESC limit 1;"
+        },
+        {
+            "input": "10 thương hiệu nào có sản phẩm được đánh giá nhiều nhất",
+            "query": "SELECT b.name AS brand_name, COUNT(r.id) AS review_count FROM review r JOIN product p ON r.product_id = p.id JOIN brand b ON p.brand_id = b.id GROUP BY b.id, b.name ORDER BY review_count DESC limit 10;"
+        },
+        {
+            "input": "thương hiệu nào được đánh giá nhiều sao nhất",
+            "query": "SELECT b.name AS brand_name, AVG(r.rating) AS average_rating FROM review r JOIN product p ON r.product_id = p.id JOIN brand b ON p.brand_id = b.id GROUP BY b.id, b.name ORDER BY average_rating DESC LIMIT 1;"
+        },
+        {
+            "input": "sản phẩm thuộc thương hiệu nào được người dùng thích nhất",
+            "query": "SELECT b.name AS brand_name, AVG(r.rating) AS average_rating FROM review r JOIN product p ON r.product_id = p.id JOIN brand b ON p.brand_id = b.id GROUP BY b.id, b.name ORDER BY average_rating DESC LIMIT 1;"
+        },
+        {
+            "input": "sản phẩm thuộc thương hiệu nào được nhiều người dùng mua nhất",
+            "query": "SELECT b.name AS brand_name, SUM(p.sold) AS total_sold FROM product p JOIN brand b ON p.brand_id = b.id GROUP BY b.id, b.name ORDER BY total_sold DESC limit 1;"
+        },
+        {
+            "input": "sản phẩm thuộc thương hiệu nào có nhiều sản phẩm giảm giá nhất",
+            "query": "SELECT brand_name, SUM(discount_product_count) AS total_discount_product_count FROM (SELECT b.name AS brand_name, COUNT(p.id) AS discount_product_count FROM product p JOIN brand b ON p.brand_id = b.id JOIN sale s ON p.sale_id = s.id GROUP BY b.id, b.name UNION ALL SELECT b.name AS brand_name, COUNT(p.id) AS discount_product_count FROM product p JOIN brand b ON p.brand_id = b.id JOIN voucher v ON p.category_id = v.category_id GROUP BY b.id, b.name ) AS combined_discounts GROUP BY brand_name ORDER BY total_discount_product_count DESC LIMIT 1;"
+        },
+        {
+            "input": "thương hiệu nào có nhiều sản phẩm giảm giá nhất",
+            "query": "SELECT brand_name, SUM(discount_product_count) AS total_discount_product_count FROM (SELECT b.name AS brand_name, COUNT(p.id) AS discount_product_count FROM product p JOIN brand b ON p.brand_id = b.id JOIN sale s ON p.sale_id = s.id GROUP BY b.id, b.name UNION ALL SELECT b.name AS brand_name, COUNT(p.id) AS discount_product_count FROM product p JOIN brand b ON p.brand_id = b.id JOIN voucher v ON p.category_id = v.category_id GROUP BY b.id, b.name ) AS combined_discounts GROUP BY brand_name ORDER BY total_discount_product_count DESC LIMIT 1;"
+        },
+        {
+            "input": "thương hiệu nào có nhiều sản phẩm giảm giá nhất từ ngày 30/1/2023 đến 25/1/2024",
+            "query": "SELECT brand_name, SUM(discount_product_count) AS total_discount_product_count FROM (SELECT b.name AS brand_name, COUNT(p.id) AS discount_product_count FROM product p JOIN brand b ON p.brand_id = b.id JOIN sale s ON p.sale_id = s.id where s.start > '2023-01-30' and s.end < '2024-01-25' GROUP BY b.id, b.name UNION ALL SELECT b.name AS brand_name, COUNT(p.id) AS discount_product_count FROM product p JOIN brand b ON p.brand_id = b.id JOIN voucher v ON p.category_id = v.category_id where v.created_at > '2023-01-30' and v.expiration_date < '2024-01-25' GROUP BY b.id, b.name ) AS combined_discounts GROUP BY brand_name ORDER BY total_discount_product_count DESC LIMIT 1;"
         }
-
     ]
     system_prefix = """You are an AI friendly and helpful AI assistant for question-answering user's task about 
     products, orders, user information, .... Given an input question, create a syntactically correct {dialect} query 
@@ -539,7 +738,7 @@ class SQLAgent:
     Please do follow up these rules before executing query:
 
     1. DO NOT make up data and no yapping.
-
+    
     2. DO NOT make any DML statements (INSERT, UPDATE, DELETE, DROP etc.) to the database.
 
     3. If the question is about describing or list all tables in database, DO NOT do that. Instead, respond politely 
@@ -554,8 +753,13 @@ class SQLAgent:
     7. If the question is about order, ask them their order code and phone number before querying data.
 
     8. If the question is about the store's finances or related things.
+    
+    9. Whenever you provide products list to user, remember always includes a properly formatted clickable hyperlink 
+    HTML a tag with product slug name (ex: <a target="_blank" 
+    href="https://filtrocoffee.com/product/colombia-finca-santa-lucia-barrelaged-strawberry"> product name </a>). 
+    Root URL is https://filtrocoffee.com/product/ and then slug name comes in
 
-    9. If the question does not seem related to the database, just say you don't know as the answer.
+    10. If the question does not seem related to the database, just say you don't know as the answer.
 
     Here is the relevant table info: {table_info}
     Here are some examples of user inputs and their corresponding SQL queries:"""
