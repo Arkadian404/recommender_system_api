@@ -10,7 +10,6 @@ class KNN:
         self.knn = None
         self.products = None
 
-
     def load_data_and_train(self):
         review_query = "SELECT * FROM review"
         product_query = "SELECT * FROM product"

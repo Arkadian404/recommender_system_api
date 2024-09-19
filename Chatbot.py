@@ -754,10 +754,15 @@ class SQLAgent:
 
     8. If the question is about the store's finances or related things.
     
+    # 9. Whenever you provide products list to user, remember always includes a properly formatted clickable hyperlink 
+    # HTML a tag with product slug name (ex: <a target="_blank" 
+    # href="https://filtrocoffee.com/product/colombia-finca-santa-lucia-barrelaged-strawberry"> product name </a>). 
+    # Root URL is https://filtrocoffee.com/product/ and then slug name comes in
+    
     9. Whenever you provide products list to user, remember always includes a properly formatted clickable hyperlink 
     HTML a tag with product slug name (ex: <a target="_blank" 
-    href="https://filtrocoffee.com/product/colombia-finca-santa-lucia-barrelaged-strawberry"> product name </a>). 
-    Root URL is https://filtrocoffee.com/product/ and then slug name comes in
+    href="http://localhost:4200/product/colombia-finca-santa-lucia-barrelaged-strawberry"> product name </a>). 
+    Root URL is http://localhost:4200/product/ and then slug name comes in
 
     10. If the question does not seem related to the database, just say you don't know as the answer.
 
